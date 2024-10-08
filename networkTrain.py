@@ -8,6 +8,7 @@ from itertools import combinations, permutations
 from tqdm import tqdm
 from tensorflow.keras.layers import Conv1D, Flatten
 import shutil
+import pickle
 
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
@@ -68,6 +69,7 @@ def trainModel(networkPath):
     finalResult = {}
     tgI = 0
     finalModels = {}
+    finalCounterG = {}
     while tgI != numOfGenes:
         temp1 = boolF.getBoolF(networkPath)
         indexListToRemove = []
@@ -109,8 +111,19 @@ def trainModel(networkPath):
                         counterG[cm]["oneCount"] += 1
                         
                     # finalDataset.append([list(cm), Y])
- 
-        # print(counterG)
+
+        if tgI not in finalCounterG:
+            finalCounterG[tgI] = {}
+        
+        finalCounterG[tgI] = counterG
+
+        for k, v in counterG.items():
+            count_0 = v["zeroCount"]
+            count_1 = v["oneCount"]
+            if count_0 >= count_1:
+                finalDataset.append([list(k), 0.0])
+            else:
+                finalDataset.append([list(k), 1.0])
         for k, v in counterG.items():
             count_0 = v["zeroCount"]
             count_1 = v["oneCount"]
@@ -152,6 +165,9 @@ def trainModel(networkPath):
         finalModels[tgI] = allModels
         tgI+=1
 
+
+    with open("counterG.pickle", "wb") as f:
+        pickle.dump(finalCounterG, f)
 
     model_dir = "M/myModels"
 

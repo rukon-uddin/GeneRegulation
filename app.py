@@ -132,7 +132,7 @@ def index():
     for k, v in finalD.items():
         for c, i in enumerate(list(v['targetGenes'])):
             arr[k + 1].append(i + 1)
-            arr[i + 1].append(k + 1)
+            # arr[i + 1].append(k + 1)
 
     sets = [list(set(lst)) for lst in arr]
     sets = sets[1:]
