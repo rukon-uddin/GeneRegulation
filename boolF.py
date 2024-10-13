@@ -7,7 +7,7 @@ def getBoolF(txtPath):
     gene_text_file = txtPath
 
     df = pd.read_csv(gene_text_file, sep=' ', header=None)
-    df.columns = columns = [i for i in range(10)]
+    df.columns = columns = [i for i in range(df.shape[1])]
 
     regulation = {"Negation": {i: [] for i in columns}, "Activation": {i: [] for i in columns}}
     network = {i: [] for i in columns}

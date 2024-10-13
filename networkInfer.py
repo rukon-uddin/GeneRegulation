@@ -94,8 +94,8 @@ def getInferRes(networkPath):
     print(temp1)
     print("********* BOOLF RES ***********")
     print("********* NN INFERENCE ***********")
-    timeStamp = 20
-    numOfGenes = 10 
+    timeStamp = len(mainData)
+    numOfGenes = len(mainData[0]) 
     tgI = 0
     finalResult = getBoolF(networkPath)
 
@@ -194,5 +194,5 @@ def getInferRes(networkPath):
     # break
     return finalResult
 
-if __name__ == "__main__":
-    getInferRes("NetworkTransition.txt0_1435.txt")
+# if __name__ == "__main__":
+#     getInferRes("NetworkTransition.txt0_1435.txt")

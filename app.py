@@ -5,6 +5,7 @@ import networkTrain
 import networkInfer
 import pprint
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+import pickle
 
 
 app = Flask(__name__)
@@ -12,13 +13,24 @@ app.config['UPLOAD_FOLDER'] = 'uploads/'  # Folder where uploaded files will be 
 finalD = {}
 
 
-def read_actual_data(file_path):
+# def read_actual_data(file_path):
+#     actual_data = {}
+#     with open(file_path, 'r') as file:
+#         for line in file:
+#             parts = list(map(int, line.split()))
+#             key = parts[0]
+#             actual_data[key] = set(parts[1:])
+#     return actual_data
+
+def read_actual_data(file_path, value_dict):
     actual_data = {}
     with open(file_path, 'r') as file:
         for line in file:
-            parts = list(map(int, line.split()))
-            key = parts[0]
-            actual_data[key] = set(parts[1:])
+            parts = line.split()  # Split the line into words
+            if not parts:
+                continue  # Skip empty lines
+            key = value_dict[parts[0]]  # Map the first item (key) using the dictionary
+            actual_data[key] = set(value_dict[part] for part in parts[1:] if part in value_dict)  # Map the rest of the line
     return actual_data
 
 def clean_file(filepath):
@@ -83,7 +95,7 @@ def calculate_metrics(actual_data, predicted_data):
 @app.route('/', methods=['GET', 'POST'])
 def index():
     global finalD
-    arr = [[], [], [], [], [], [], [], [], [], [], []]
+    arr = [[], [], [], [], [], [], [], [], [], [], [], []]
     accuracy = 0.0
     recall = 0.0
     f1 = 0.0
@@ -110,9 +122,21 @@ def index():
 
             networkTrain.trainModel(cleaned_filepath)
             finalD = networkInfer.getInferRes(cleaned_filepath)
-            
+            cell_cycle_dict = {
+                "Cln3": 0,
+                "MBF": 1,
+                "SBF": 2,
+                "Cln1": 3,
+                "Cdh1": 4,
+                "Swi5": 5,
+                "Cdc20": 6,
+                "Clb5": 7,
+                "Sic1": 8,
+                "Clb1": 9,
+                "Mcm1": 10
+            }
             file_path2 = filepath2
-            actual_data = read_actual_data(file_path2)
+            actual_data = read_actual_data(file_path2, cell_cycle_dict)
             predicted_data = {k: set(v['targetGenes']) for k, v in finalD.items()}
             accuracy, precision, recall, f1, accuracy_per_key = calculate_metrics(actual_data, predicted_data)
             
@@ -137,6 +161,9 @@ def index():
     sets = [list(set(lst)) for lst in arr]
     sets = sets[1:]
     # return render_template('index.html', listt=json.dumps(sets))
+    with open("helllllloooooo.pkl", 'wb') as pickle_file:
+        pickle.dump(sets, pickle_file)
+    print(sets)
     return render_template('index.html', 
                            listt=json.dumps(sets), 
                            accuracy=accuracy, 

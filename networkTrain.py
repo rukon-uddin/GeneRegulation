@@ -181,5 +181,5 @@ def trainModel(networkPath):
             model.save(f"{model_dir}/model_{key}_{sub_key}.keras")
         
 
-if __name__ == "__main__":
-    trainModel("NetworkTransition.txt0_1435.txt")
+# if __name__ == "__main__":
+#     trainModel("NetworkTransition.txt0_1435.txt")
