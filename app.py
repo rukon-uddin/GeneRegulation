@@ -5,6 +5,7 @@ import networkTrain
 import networkInfer
 import pprint
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+import pickle
 
 
 app = Flask(__name__)
@@ -132,10 +133,15 @@ def index():
     for k, v in finalD.items():
         for c, i in enumerate(list(v['targetGenes'])):
             arr[k + 1].append(i + 1)
-            arr[i + 1].append(k + 1)
+            # arr[i + 1].append(k + 1)
 
     sets = [list(set(lst)) for lst in arr]
     sets = sets[1:]
+    print("Set", "*"*50)
+    print(sets)
+    print("*"*50)
+    with open("setForFE.pkl", "wb") as wb:
+        pickle.dump(sets, wb)
     # return render_template('index.html', listt=json.dumps(sets))
     return render_template('index.html', 
                            listt=json.dumps(sets), 

@@ -90,8 +90,8 @@ def getInferRes(networkPath):
     print(temp1)
     print("********* BOOLF RES ***********")
     print("********* NN INFERENCE ***********")
-    timeStamp = 20
-    numOfGenes = 10 
+    timeStamp = len(mainData)
+    numOfGenes = len(mainData[0])
     tgI = 0
     finalResult = getBoolF(networkPath)
 
@@ -117,6 +117,7 @@ def getInferRes(networkPath):
         for t0 in range(timeStamp):
             if t0+1 == timeStamp or tgI == numOfGenes:
                 break
+            print(t0, tgI)
             x = mainData[t0][:tgI] + mainData[t0][tgI+1:]
             # x = mainData[t0]
             # x = remove_elements_from_row(mainData, t0, indexListToRemove)
@@ -179,3 +180,6 @@ def getInferRes(networkPath):
         print(finalResult)
     # break
     return finalResult
+
+# if __name__ == "__main__":
+#     getInferRes("")
