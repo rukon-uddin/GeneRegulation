@@ -65,8 +65,6 @@ def getInferRes(networkPath):
     with open("counterG.pickle", "rb") as f:
         counterG = pickle.load(f)
 
-
-
     save_dir = 'M/myModels'
 
     loaded_models_dict = {}

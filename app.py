@@ -161,8 +161,8 @@ def index():
     sets = [list(set(lst)) for lst in arr]
     sets = sets[1:]
     # return render_template('index.html', listt=json.dumps(sets))
-    with open("helllllloooooo.pkl", 'wb') as pickle_file:
-        pickle.dump(sets, pickle_file)
+    # with open("helllllloooooo.pkl", 'wb') as pickle_file:
+    #     pickle.dump(sets, pickle_file)
     print(sets)
     return render_template('index.html', 
                            listt=json.dumps(sets), 
