@@ -8,7 +8,6 @@ from itertools import combinations, permutations
 from tqdm import tqdm
 from tensorflow.keras.layers import Conv1D, Flatten
 import shutil
-import pickle
 
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
@@ -69,7 +68,6 @@ def trainModel(networkPath):
     finalResult = {}
     tgI = 0
     finalModels = {}
-    finalCounterG = {}
     while tgI != numOfGenes:
         temp1 = boolF.getBoolF(networkPath)
         indexListToRemove = []
@@ -89,7 +87,6 @@ def trainModel(networkPath):
         yList = [i[tgI] for i in mainData]
 
         finalDataset = []
-        counterG = {}
         for i in range(timeStamp):
             if i+1 == timeStamp:
                 break
@@ -101,37 +98,12 @@ def trainModel(networkPath):
             # x = remove_elements_from_row(mainData, i, indexListToRemove)
             x = [float(v) for v in x]
             for r in range(1, len(x) + 1):
+                # comb = generate_combinations_with_indices(x, r) # taking only unique values
                 comb = list(set(combinations(x, r))) # taking only unique values
                 for cm in comb:
-                    if cm not in counterG:
-                        counterG[cm] = {"zeroCount":0, "oneCount": 0}
-                    if Y == 0.0:
-                        counterG[cm]["zeroCount"] += 1
-                    else:
-                        counterG[cm]["oneCount"] += 1
-                        
-                    # finalDataset.append([list(cm), Y])
-
-        if tgI not in finalCounterG:
-            finalCounterG[tgI] = {}
-        
-        finalCounterG[tgI] = counterG
-
-        for k, v in counterG.items():
-            count_0 = v["zeroCount"]
-            count_1 = v["oneCount"]
-            if count_0 >= count_1:
-                finalDataset.append([list(k), 0.0])
-            else:
-                finalDataset.append([list(k), 1.0])
-        for k, v in counterG.items():
-            count_0 = v["zeroCount"]
-            count_1 = v["oneCount"]
-            if count_0 >= count_1:
-                finalDataset.append([list(k), 0.0])
-            else:
-                finalDataset.append([list(k), 1.0])
-        
+                    finalDataset.append([list(cm), Y])
+                # x = [float(k) for k in x]
+                # finalDataset.append([x, Y])
         print(len(finalDataset))
         for ng in range(1, numOfGenes):
             size = ng
@@ -166,9 +138,6 @@ def trainModel(networkPath):
         tgI+=1
 
 
-    with open("counterG.pickle", "wb") as f:
-        pickle.dump(finalCounterG, f)
-
     model_dir = "M/myModels"
 
     if os.path.exists(model_dir):
@@ -179,7 +148,3 @@ def trainModel(networkPath):
     for key, model_dict in finalModels.items():
         for sub_key, model in model_dict.items():
             model.save(f"{model_dir}/model_{key}_{sub_key}.keras")
-        
-
-# if __name__ == "__main__":
-#     trainModel("NetworkTransition.txt0_1435.txt")

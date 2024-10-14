@@ -6,7 +6,6 @@ import numpy as np
 from boolF import getBoolF
 import os
 from tensorflow.keras.models import load_model
-import pickle
 
 
 def generate_combinations_with_indices(arr, r):
@@ -62,9 +61,6 @@ def getInferRes(networkPath):
         mainData = nt.readlines()
     mainData = [i.strip(" \n").split(" ") for i in mainData]
 
-    with open("counterG.pickle", "rb") as f:
-        counterG = pickle.load(f)
-
 
 
     save_dir = 'M/myModels'
@@ -94,8 +90,8 @@ def getInferRes(networkPath):
     print(temp1)
     print("********* BOOLF RES ***********")
     print("********* NN INFERENCE ***********")
-    timeStamp = len(mainData)
-    numOfGenes = len(mainData[0]) 
+    timeStamp = 20
+    numOfGenes = 10 
     tgI = 0
     finalResult = getBoolF(networkPath)
 
@@ -121,8 +117,8 @@ def getInferRes(networkPath):
         for t0 in range(timeStamp):
             if t0+1 == timeStamp or tgI == numOfGenes:
                 break
-            # x = mainData[t0][:tgI] + mainData[t0][tgI+1:]
-            x = mainData[t0]
+            x = mainData[t0][:tgI] + mainData[t0][tgI+1:]
+            # x = mainData[t0]
             # x = remove_elements_from_row(mainData, t0, indexListToRemove)
             alreadyTaken = {}
 
@@ -135,7 +131,7 @@ def getInferRes(networkPath):
                     # print(i)
                     for k, v in cc.items():
                         if k >= tgI:
-                            k = k+1
+                            k+=1
                         keyList.append(k)
                         valList.append(v)
                     if len(keyList) == 0:
@@ -154,10 +150,8 @@ def getInferRes(networkPath):
             x = v
             predList = []
             probPred = []
-            if len(x[0]) > 5:
-                continue
             
-            
+            # print(k, v)
             for p in x:
                 predData = np.array([p])
                 predictions = loaded_models_dict[tgI][len(p)].predict(predData, verbose=0)
@@ -169,20 +163,12 @@ def getInferRes(networkPath):
             max_value = max(probPred) - 0.1
 
             predList = [1 if value >= max_value else 0 for value in probPred]
-            yy = []
-            for p in x:
-                counter0 = counterG[tgI][tuple(p)]["zeroCount"]
-                counter1 = counterG[tgI][tuple(p)]["oneCount"]
-                if counter0>=counter1:
-                    yy.append(0.0)
-                else:
-                    yy.append(1.0)
-            # yy = yList[1:]
-            # yy = [float(b) for b in yy]
+            yy = yList[1:]
+            yy = [float(b) for b in yy]
             mismatches = sum([1 for pred, actual in zip(predList, yy) if pred != actual])
 
             if mismatches < minMismatch:
-                print(f"Previous minMismatch: {minMismatch} | Improved: {mismatches} | GeneCombination: {k}")
+                print(f"Previous minMismatch: {minMismatch}   Improved: {mismatches}")
                 minMismatch = mismatches
                 finalResult[tgI] = {"targetGenes": k, "mismatch": mismatches}
                 if mismatches == 0:
@@ -193,6 +179,3 @@ def getInferRes(networkPath):
         print(finalResult)
     # break
     return finalResult
-
-# if __name__ == "__main__":
-#     getInferRes("NetworkTransition.txt0_1435.txt")
